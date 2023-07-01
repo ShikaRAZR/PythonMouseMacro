@@ -2,9 +2,9 @@
 A macro program written in Python that records and runs mouse macros, click and drag.  
 
 ## Goals
-- Export Mouse Macros
-
 - Run Macro, Macro Settings, Record, End Recording
+  - Only coordinates for mouse press and release are saved.
+  - Algorithm for human like mouse movements will be used to move from start to end 
 
 - Macro Settings
   - Edit Pixel Disposition (0-20 pixel difference)
@@ -19,5 +19,5 @@ A macro program written in Python that records and runs mouse macros, click and 
 
 ## How To Use
 - Place app.py and macrorecorder.py into a folder of it's own
-- Create a folder in the current directory called "macrolist" (this is where all macros will be saved)
+- Create a folder in the current directory called "macrolist" (this is where all macros will be saved as .txt files)
 - Run app.py

@@ -213,12 +213,10 @@ def refresh_root_macro_list():  # HELPER refresh macro list in root window
     global list_of_macros
     global macro_list_box
     list_of_macros = os.listdir(str(Path(__file__).parent.resolve()) + "\macrolist")
-    macro_list_box = tk.Listbox(root, height=15)
-    macro_list_box.grid(
-        column=0, row=4, padx=(10, 10), pady=(10, 10), columnspan=4, ipadx=120
-    )
+    macro_list_box.delete(0,tk.END)
     for macro in list_of_macros:
-        macro_list_box.insert("end", macro)
+        if macro[-4:] == ".txt":
+            macro_list_box.insert("end", macro)
 
 
 def move_Window(
@@ -292,7 +290,8 @@ if __name__ == "__main__":
         column=0, row=4, padx=(10, 10), pady=(10, 10), columnspan=4, ipadx=120
     )
     for macro in list_of_macros:
-        macro_list_box.insert("end", macro)
+        if macro[-4:] == ".txt":
+            macro_list_box.insert("end", macro)
 
     # Window that follows cursor, used to notify when recording and where the coordinates of the mouse are
     cursor_follow_window = tk.Tk()
