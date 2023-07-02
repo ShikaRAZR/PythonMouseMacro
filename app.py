@@ -53,6 +53,27 @@ def on_closing_edit_window():
     root.deiconify()
     edit_window.withdraw()
 
+def add_macro(): # adds of macro compiled list
+    if str(macro_list_box.curselection()) != "()":
+        global edit_macro_file_name
+        global list_macros_run
+        edit_macro_file_name = macro_list_box.get(macro_list_box.curselection())
+        fullfilepath = (
+            str(Path(__file__).parent.resolve())
+            + "\macrolist\\"
+            + edit_macro_file_name
+        )
+        if Path(fullfilepath).is_file():
+            list_macros_run.append(edit_macro_file_name)
+            refresh_run_macro_list()
+    print("Main - Add Macro")
+
+def clear_list(): # clears macro compiled list
+    global list_macros_run
+    list_macros_run = []
+    refresh_run_macro_list()
+    print("Main - Clear List")
+    
 
 def edit_macro():  # only shows edit_window when macro is selected
     if str(macro_list_box.curselection()) != "()":
@@ -81,7 +102,6 @@ def edit_macro():  # only shows edit_window when macro is selected
             macro_box_one.focus_set()
             root.withdraw()
             edit_window.deiconify()
-            
     refresh_root_macro_list()
     print("Main - Edit Macro")
 
@@ -120,15 +140,7 @@ def edit_macro_submit():  # changes selected macro's parameters
         print("Main - Valid Macro Sumbit")
         global edit_macro_file_name
         fullfilepath = (str(Path(__file__).parent.resolve()) + "\macrolist\\" + edit_macro_file_name)
-        with open(fullfilepath, "r") as file:
-            data = file.readlines()
-        data[0] = pixel_disposition_input+"\n"
-        data[1] = delay_start_input+"\n"
-        data[2] = delay_end_input+"\n"
-        data[3] = run_chance_input+"\n"
-        data[4] = repeat_input+"\n"
-        with open(fullfilepath, "w") as file:
-            file.writelines(data)
+        macrorecorder.modify_mouse_macro(fullfilepath, pixel_disposition_input, delay_start_input, delay_end_input, run_chance_input, repeat_input)
         macro_box_one.focus_set()
         root.deiconify()
         edit_window.withdraw()
@@ -152,6 +164,8 @@ def record():  # Records mouse clicks, record button becomes red color, activate
     global is_recording
     if is_recording == False:  # no dupe buttons/actions when pressed twice
         is_recording = True
+        global notif_text
+        notif_text = "Recording"
         macrorecorder.record_mouse()
         # changes button appearance when enabled
         record_macro_button.config(text="   Recording    ", fg="red")
@@ -219,6 +233,13 @@ def refresh_root_macro_list():  # HELPER refresh macro list in root window
         if macro[-4:] == ".txt":
             macro_list_box.insert("end", macro)
 
+def refresh_run_macro_list(): # HELPER refresh compiled macro list in root_frame window
+    global list_macros_run
+    global run_macro_list_box
+    run_macro_list_box.delete(0,tk.END)
+    for macro in list_macros_run:
+        if macro[-4:] == ".txt":
+            run_macro_list_box.insert("end", macro)
 
 def move_Window(
     root_variable, x, y
@@ -240,9 +261,10 @@ def record_notification():  # HELPER used to constantly update position of recor
             current_mouse_position_x + 10,
             current_mouse_position_y + 10,
         )
+        global notif_text
         coord_label = tk.Label(
             cursor_follow_window,
-            text="Recording X: {0} Y: {1}".format(
+            text=notif_text + " X: {0} Y: {1}".format(
                 current_mouse_position_x, current_mouse_position_y
             ),
         ).grid(column=0, row=0)
@@ -261,6 +283,7 @@ if __name__ == "__main__":
     # Variables
     gui_is_running = True
     is_recording = False
+    notif_text = ""
     current_mouse_position_x = 0
     current_mouse_position_y = 0
     macro_thread = Thread(target=macrorecorder.start_listener)
@@ -299,9 +322,9 @@ if __name__ == "__main__":
     root_frame = tk.LabelFrame(root)
     root_frame.grid(column=0, row=3, columnspan=4)
     root_frame.config(background="#252527", bd=0) # bd is border width = 0
-    add_macro_list_button = tk.Button(root_frame, text="Add Macro")
+    add_macro_list_button = tk.Button(root_frame, text="Add Macro", command=add_macro)
     add_macro_list_button.grid(column=0, row=0, padx=(10, 10), pady=(10, 10))
-    clear_macro_list_button = tk.Button(root_frame, text="Clear List")
+    clear_macro_list_button = tk.Button(root_frame, text="Clear List", command=clear_list)
     clear_macro_list_button.grid(column=1, row=0, padx=(10, 10), pady=(10, 10))
     run_macro_list_button = tk.Button(root_frame, text="Run Macro List 1-10x")
     run_macro_list_button.grid(column=2, row=0, padx=(10, 10), pady=(10, 10))
@@ -317,7 +340,7 @@ if __name__ == "__main__":
     # Window that follows cursor, used to notify when recording and where the coordinates of the mouse are
     cursor_follow_window = tk.Tk()
     cursor_follow_window.overrideredirect(1)  # 0 shows bar 1 hides bar
-    cursor_follow_window.geometry("140x20")
+    cursor_follow_window.geometry("130x20")
     coord_label = tk.Label(
         cursor_follow_window,
         text="Recording X: {0} Y: {1}".format(

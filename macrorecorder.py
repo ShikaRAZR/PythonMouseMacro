@@ -129,5 +129,14 @@ def import_mouse_macro():
     print("Module - Import")
 
 
-def modify_mouse_macro():
+def modify_mouse_macro(fullfilepath, pixel_disposition_input, delay_start_input, delay_end_input, run_chance_input, repeat_input):
+    with open(fullfilepath, "r") as file:
+            data = file.readlines()
+    data[0] = pixel_disposition_input+"\n"
+    data[1] = delay_start_input+"\n"
+    data[2] = delay_end_input+"\n"
+    data[3] = run_chance_input+"\n"
+    data[4] = repeat_input+"\n"
+    with open(fullfilepath, "w") as file:
+        file.writelines(data)
     print("Module - Modify")
