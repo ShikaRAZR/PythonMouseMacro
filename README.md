@@ -7,7 +7,7 @@ A macro program written in Python that records and runs mouse macros, click and 
   - Algorithm for human like mouse movements will be used to move from start to end 
 
 - Macro Settings
-  - Edit Pixel Disposition (0-20 pixel difference)
+  - Edit Random Pixel Disposition (0-20 pixel difference)
   - Edit Time Delay Randomization (will add time delay for every click at a random range between user input's start and end)
   - Edit Random Run Chance (Percentage run chance)
   - Amount of times repeated

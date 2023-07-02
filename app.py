@@ -10,6 +10,7 @@ GUI for Mouse Macro
 
 
 import tkinter as tk
+from tkinter import ttk
 import pyautogui
 from threading import Thread
 import macrorecorder
@@ -256,6 +257,7 @@ def record_notification():  # HELPER used to constantly update position of recor
 if __name__ == "__main__":
     print("Path of the script: " + str(Path(__file__).parent.resolve()))
     print("Path of the working directory: " + str(Path().resolve()))
+    
     # Variables
     gui_is_running = True
     is_recording = False
@@ -264,6 +266,7 @@ if __name__ == "__main__":
     macro_thread = Thread(target=macrorecorder.start_listener)
     macro_thread.start()  # mouse listener thread starts in this thread
     edit_macro_file_name = None
+    
     # Main Window
     root = tk.Tk()
     root.title("Mouse Macro")
@@ -287,12 +290,30 @@ if __name__ == "__main__":
     list_of_macros = os.listdir(str(Path(__file__).parent.resolve()) + "\macrolist")
     macro_list_box = tk.Listbox(root, height=15)
     macro_list_box.grid(
-        column=0, row=4, padx=(10, 10), pady=(10, 10), columnspan=4, ipadx=120
+        column=0, row=2, padx=(10, 10), pady=(10, 10), columnspan=4, ipadx=120
     )
     for macro in list_of_macros:
         if macro[-4:] == ".txt":
             macro_list_box.insert("end", macro)
-
+    # Macro Compiler Frame used to organize bottom half of main window in a separate grid
+    root_frame = tk.LabelFrame(root)
+    root_frame.grid(column=0, row=3, columnspan=4)
+    root_frame.config(background="#252527", bd=0) # bd is border width = 0
+    add_macro_list_button = tk.Button(root_frame, text="Add Macro")
+    add_macro_list_button.grid(column=0, row=0, padx=(10, 10), pady=(10, 10))
+    clear_macro_list_button = tk.Button(root_frame, text="Clear List")
+    clear_macro_list_button.grid(column=1, row=0, padx=(10, 10), pady=(10, 10))
+    run_macro_list_button = tk.Button(root_frame, text="Run Macro List 1-10x")
+    run_macro_list_button.grid(column=2, row=0, padx=(10, 10), pady=(10, 10))
+    repeat_combo_box = ttk.Combobox(root_frame, values = [1,2,3,4,5,6,7,8,9,10], width=3)
+    repeat_combo_box.current(0)
+    repeat_combo_box.grid(column=3, row=0, padx=(10, 10), pady=(10, 10))
+    list_macros_run = []
+    run_macro_list_box = tk.Listbox(root_frame, height=10)
+    run_macro_list_box.grid(
+        column=0, row=1, padx=(10, 10), pady=(10, 10), columnspan=4, ipadx=120
+    )
+    
     # Window that follows cursor, used to notify when recording and where the coordinates of the mouse are
     cursor_follow_window = tk.Tk()
     cursor_follow_window.overrideredirect(1)  # 0 shows bar 1 hides bar
