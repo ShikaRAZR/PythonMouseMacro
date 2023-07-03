@@ -21,7 +21,8 @@ import os
 
 # Functions
 def on_closing_root():  # when exiting root GUI, ends threads, destroys all windows
-    macrorecorder.end_listener()
+    macrorecorder.end_mouse_listener()
+    macrorecorder.end_keyboard_listener()
     global gui_is_running
     gui_is_running = False
     root.destroy()
@@ -74,6 +75,24 @@ def clear_list(): # clears macro compiled list
     refresh_run_macro_list()
     print("Main - Clear List")
     
+def run_macro():
+    global is_recording
+    global is_running_macro
+    if (str(macro_list_box.curselection()) != "()" and is_recording == False and is_running_macro == False):
+        global edit_macro_file_name
+        global list_macros_run
+        is_running_macro = True
+        edit_macro_file_name = macro_list_box.get(macro_list_box.curselection())
+        fullfilepath = (
+            str(Path(__file__).parent.resolve())
+            + "\macrolist\\"
+            + edit_macro_file_name
+        )
+        macrorecorder.run_mouse_macro(fullfilepath)
+        
+        is_running_macro = False
+    print("Main - Run Macro")
+
 
 def edit_macro():  # only shows edit_window when macro is selected
     if str(macro_list_box.curselection()) != "()":
@@ -162,7 +181,8 @@ def is_int(x): # HELPER
 
 def record():  # Records mouse clicks, record button becomes red color, activates record notification window
     global is_recording
-    if is_recording == False:  # no dupe buttons/actions when pressed twice
+    global is_running_macro
+    if is_recording == False and is_running_macro == False:  # no dupe buttons/actions when pressed twice
         is_recording = True
         global notif_text
         notif_text = "Recording"
@@ -283,16 +303,19 @@ if __name__ == "__main__":
     # Variables
     gui_is_running = True
     is_recording = False
+    is_running_macro = False
     notif_text = ""
     current_mouse_position_x = 0
     current_mouse_position_y = 0
-    macro_thread = Thread(target=macrorecorder.start_listener)
+    macro_thread = Thread(target=macrorecorder.start_mouse_listener)
     macro_thread.start()  # mouse listener thread starts in this thread
+    keyboard_thread = Thread(target=macrorecorder.start_keyboard_listener)
+    keyboard_thread.start()  # keyboard listener thread starts in this thread
     edit_macro_file_name = None
     
     # Main Window
     root = tk.Tk()
-    root.title("Mouse Macro")
+    root.title("Mouse Macro (Esc to Stop Running Macro)")
     root.geometry("400x600")
     root.config(background="#252527")
     root.resizable(width=False, height=False)
@@ -301,7 +324,7 @@ if __name__ == "__main__":
         root, text="Options", background="#252527", font=("Arial", 15), fg="white"
     ).grid(column=0, row=0, padx=(10, 10), pady=(10, 10))
     # Options for Running, Editing, Recording Macros
-    run_macro_button = tk.Button(root, text="Run Macro")
+    run_macro_button = tk.Button(root, text="Run Macro", command = run_macro)
     run_macro_button.grid(column=0, row=1, padx=(10, 10), pady=(10, 10))
     edit_macro_button = tk.Button(root, text="Edit Macro", command=edit_macro)
     edit_macro_button.grid(column=1, row=1, padx=(10, 10), pady=(10, 10))
@@ -340,7 +363,7 @@ if __name__ == "__main__":
     # Window that follows cursor, used to notify when recording and where the coordinates of the mouse are
     cursor_follow_window = tk.Tk()
     cursor_follow_window.overrideredirect(1)  # 0 shows bar 1 hides bar
-    cursor_follow_window.geometry("130x20")
+    cursor_follow_window.geometry("140x20")
     coord_label = tk.Label(
         cursor_follow_window,
         text="Recording X: {0} Y: {1}".format(
