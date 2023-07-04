@@ -74,7 +74,25 @@ def clear_list(): # clears macro compiled list
     list_macros_run = []
     refresh_run_macro_list()
     print("Main - Clear List")
-    
+
+def run_macro_list():
+    if len(list_macros_run)>0:
+        fullfilepath_macrolist = []
+        filepath = (
+            str(Path(__file__).parent.resolve())
+            + "\macrolist\\"
+        )
+        for macro in list_macros_run:
+            fullfilepath_macrolist.append(filepath+macro)
+
+        list_repeat_amount = repeat_combo_box.get()
+        if (list_repeat_amount.isdigit() and int(list_repeat_amount)>=1 and int(list_repeat_amount)<=10):
+            for x in range(int(list_repeat_amount)):
+                for fullfilepath in fullfilepath_macrolist:
+                    if(macrorecorder.run_mouse_macro(fullfilepath)==False):
+                        return False
+    print("Main - Run Macro List")
+
 def run_macro():
     global is_recording
     global is_running_macro
@@ -349,7 +367,7 @@ if __name__ == "__main__":
     add_macro_list_button.grid(column=0, row=0, padx=(10, 10), pady=(10, 10))
     clear_macro_list_button = tk.Button(root_frame, text="Clear List", command=clear_list)
     clear_macro_list_button.grid(column=1, row=0, padx=(10, 10), pady=(10, 10))
-    run_macro_list_button = tk.Button(root_frame, text="Run Macro List 1-10x")
+    run_macro_list_button = tk.Button(root_frame, text="Run Macro List 1-10x", command=run_macro_list)
     run_macro_list_button.grid(column=2, row=0, padx=(10, 10), pady=(10, 10))
     repeat_combo_box = ttk.Combobox(root_frame, values = [1,2,3,4,5,6,7,8,9,10], width=3)
     repeat_combo_box.current(0)

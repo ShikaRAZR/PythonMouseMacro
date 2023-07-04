@@ -219,11 +219,11 @@ def run_mouse_macro(fullfilepath): # sets up a list of coordinates based on file
         # Running Macro
         for x in range(repeat_input):
             if stop_macro_running:
-                break
+                return False
             if(random.randint(1,100)<=run_chance_input):
                 for x in range(0,len(mouse_action_list),2):
                     if stop_macro_running:
-                        break
+                        return False
                     time.sleep(mouse_timer_list[x])
                     start_x_coord = mouse_coord_x_list[x]
                     start_y_coord = mouse_coord_y_list[x]
@@ -244,7 +244,8 @@ def drag_mouse(points, time_interval): # takes an array of coordinates (points) 
     mouse_controller.press(Button.left)
     for x in range(1, len(points)):
         if stop_macro_running:
-                break
+                mouse_controller.release(Button.left)
+                return False
         time.sleep(time_interval)
         mouse_controller.move(points[x][0]-points[x-1][0], points[x][1]-points[x-1][1])
     mouse_controller.release(Button.left)
