@@ -6,8 +6,8 @@ Mouse Record - https://pynput.readthedocs.io/en/latest/mouse.html#monitoring-the
 
 Will record, run, export import and modify mouse movements 
 """
+import pydirectinput
 from pynput import mouse, keyboard
-from pynput.mouse import Button, Controller
 from timeit import default_timer
 from pathlib import Path
 import random
@@ -27,7 +27,7 @@ mouse_timer_list = []
 mouse_coord_x_list = []
 mouse_coord_y_list = []
 stop_macro_running = True
-mouse_controller = Controller()
+pydirectinput.PAUSE = 0
 
 def start_mouse_listener():  # started when program starts
     global mouse_listener
@@ -222,6 +222,7 @@ def run_mouse_macro(fullfilepath): # sets up a list of coordinates based on file
                 return False
             if(random.randint(1,100)<=run_chance_input):
                 for x in range(0,len(mouse_action_list),2):
+                    print("NEW ACTION___________________________________________")
                     if stop_macro_running:
                         return False
                     time.sleep(mouse_timer_list[x])
@@ -229,29 +230,49 @@ def run_mouse_macro(fullfilepath): # sets up a list of coordinates based on file
                     start_y_coord = mouse_coord_y_list[x]
                     end_x_coord = mouse_coord_x_list[x+1]
                     end_y_coord = mouse_coord_y_list[x+1]
-                    points = [[start_x_coord,start_y_coord]]
-                    wind_mouse(start_x_coord,start_y_coord,end_x_coord,end_y_coord,move_mouse=lambda x,y: points.append([x,y]))
-                    points.append([end_x_coord,end_y_coord])
-                    time_interval = round((mouse_timer_list[x+1]/len(points)), 5)
-                    drag_mouse(points, time_interval) # moving mouse
-                    for point in points:
-                        print("("+str(point[0])+","+str(point[1])+")")
-                    print(time_interval)
+                    
+                    if (mouse_timer_list[x+1]<.2): # if mouse pressing is held shorter than .2 seconds
+                        click_mouse(start_x_coord,start_y_coord, mouse_timer_list[x+1])
+                    else: 
+                        points = [[start_x_coord,start_y_coord]]
+                        wind_mouse(start_x_coord,start_y_coord,end_x_coord,end_y_coord,move_mouse=lambda x,y: points.append([x,y]))
+                        points.append([end_x_coord,end_y_coord])
+                        points = interpolate_points(points)
+                        points = interpolate_points(points)
+                        time_interval = round((mouse_timer_list[x+1]/len(points)), 5)
+                        drag_mouse(points, time_interval) # moving mouse
+                    print("mouse_timer " + str(mouse_timer_list[x+1]))
     print("Module - Run")
+    
+def interpolate_points (points):
+    new_points = []
+    new_points.append(points[0])
+    for x in range(1,len(points)):
+        new_points.append([int((points[x][0]+points[x-1][0])/2), int((points[x][1]+points[x-1][1])/2)])
+        new_points.append(points[x])
+    return new_points
 
 def drag_mouse(points, time_interval): # takes an array of coordinates (points) and drags on an interval (time_interval)
-    mouse_controller.position = (points[0][0],points[0][1])
-    mouse_controller.press(Button.left)
+    pydirectinput.moveTo(points[0][0],points[0][1])
+    pydirectinput.mouseDown()
     for x in range(1, len(points)):
         if stop_macro_running:
-                mouse_controller.release(Button.left)
+                pydirectinput.mouseUp()
                 return False
         time.sleep(time_interval)
-        mouse_controller.move(points[x][0]-points[x-1][0], points[x][1]-points[x-1][1])
-    time.sleep(.2)
-    mouse_controller.move(0, 0)
-    mouse_controller.release(Button.left)
+        pydirectinput.move(points[x][0]-points[x-1][0], points[x][1]-points[x-1][1])
+    time.sleep(.3)
+    pydirectinput.mouseUp()
+    print("time_interval "+ str(time_interval))
+    for point in points:
+        print("("+str(point[0])+","+str(point[1])+")")
     print("Module - Move")
+
+def click_mouse(posX,posY, time_interval):
+    pydirectinput.moveTo(posX,posY)
+    pydirectinput.mouseDown()
+    time.sleep(time_interval)
+    pydirectinput.mouseUp()
 
 def wind_mouse(start_x, start_y, dest_x, dest_y, G_0=9, W_0=3, M_0=15, D_0=12, move_mouse=lambda x,y: None):
     '''
@@ -292,4 +313,3 @@ def wind_mouse(start_x, start_y, dest_x, dest_y, G_0=9, W_0=3, M_0=15, D_0=12, m
             #This should wait for the mouse polling interval
             move_mouse(current_x:=move_x,current_y:=move_y)
     return current_x,current_y
-
