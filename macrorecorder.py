@@ -248,7 +248,7 @@ def drag_mouse(points, time_interval): # takes an array of coordinates (points) 
                 return False
         time.sleep(time_interval)
         mouse_controller.move(points[x][0]-points[x-1][0], points[x][1]-points[x-1][1])
-    time.sleep(.1)
+    time.sleep(.2)
     mouse_controller.move(0, 0)
     mouse_controller.release(Button.left)
     print("Module - Move")
