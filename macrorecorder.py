@@ -235,7 +235,7 @@ def run_mouse_macro(fullfilepath): # sets up a list of coordinates based on file
                     time_interval = round((mouse_timer_list[x+1]/len(points)), 5)
                     drag_mouse(points, time_interval) # moving mouse
                     for point in points:
-                        print(point)
+                        print("("+str(point[0])+","+str(point[1])+")")
                     print(time_interval)
     print("Module - Run")
 
@@ -248,6 +248,8 @@ def drag_mouse(points, time_interval): # takes an array of coordinates (points) 
                 return False
         time.sleep(time_interval)
         mouse_controller.move(points[x][0]-points[x-1][0], points[x][1]-points[x-1][1])
+    time.sleep(.1)
+    mouse_controller.move(0, 0)
     mouse_controller.release(Button.left)
     print("Module - Move")
 
