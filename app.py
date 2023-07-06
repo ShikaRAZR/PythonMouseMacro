@@ -86,11 +86,15 @@ def run_macro_list():
             fullfilepath_macrolist.append(filepath+macro)
 
         list_repeat_amount = repeat_combo_box.get()
+        run_macro_list_button.config(text="  Running Macro List  ", fg="red")
+        root.update_idletasks()
         if (list_repeat_amount.isdigit() and int(list_repeat_amount)>=1 and int(list_repeat_amount)<=10):
             for x in range(int(list_repeat_amount)):
                 for fullfilepath in fullfilepath_macrolist:
                     if(macrorecorder.run_mouse_macro(fullfilepath)==False):
+                        run_macro_list_button.config(text="Run Macro List 1-10x", fg="black")
                         return False
+        run_macro_list_button.config(text="Run Macro List 1-10x", fg="black")
     print("Main - Run Macro List")
 
 def run_macro():
