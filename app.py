@@ -114,7 +114,7 @@ def run_macro():
     print("Main - Run Macro")
 
 def edit_macro():  # only shows edit_window when macro is selected
-    if str(macro_list_box.curselection()) != "()":
+    if str(macro_list_box.curselection()) != "()" and is_recording == False and is_running_macro == False:
         global edit_macro_file_name
         edit_macro_file_name = macro_list_box.get(macro_list_box.curselection())
         fullfilepath = (
