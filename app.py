@@ -17,7 +17,7 @@ import macrorecorder
 import re
 from pathlib import Path
 import os
-
+import time
 
 # Functions
 def on_closing_root():  # when exiting root GUI, ends threads, destroys all windows
@@ -97,6 +97,8 @@ def run_macro():
     global is_recording
     global is_running_macro
     if (str(macro_list_box.curselection()) != "()" and is_recording == False and is_running_macro == False):
+        run_macro_button.config(text="   Running   ", fg="red")
+        root.update_idletasks()
         global edit_macro_file_name
         global list_macros_run
         is_running_macro = True
@@ -107,10 +109,9 @@ def run_macro():
             + edit_macro_file_name
         )
         macrorecorder.run_mouse_macro(fullfilepath)
-        
         is_running_macro = False
+        run_macro_button.config(text="Run Macro", fg="black")
     print("Main - Run Macro")
-
 
 def edit_macro():  # only shows edit_window when macro is selected
     if str(macro_list_box.curselection()) != "()":
@@ -207,9 +208,9 @@ def record():  # Records mouse clicks, record button becomes red color, activate
         macrorecorder.record_mouse()
         # changes button appearance when enabled
         record_macro_button.config(text="   Recording    ", fg="red")
-        cursor_follow_window.attributes("-topmost", True)  # topmost window
-        cursor_follow_window.deiconify()
-        record_notification()
+        # cursor_follow_window.attributes("-topmost", True)  # topmost window
+        # cursor_follow_window.deiconify()
+        # record_notification()
         print("Main - Record")
 
 
@@ -222,8 +223,8 @@ def end_record():  # Stops recording mouse clicks, requests user input to export
             export_macro_window()
         # changes button appearance when disabled
         record_macro_button.config(text="Record Macro", fg="black")
-        cursor_follow_window.attributes("-topmost", False)
-        cursor_follow_window.withdraw()
+        # cursor_follow_window.attributes("-topmost", False)
+        # cursor_follow_window.withdraw()
         print("Main - End Record")
 
 

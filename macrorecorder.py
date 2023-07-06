@@ -217,15 +217,19 @@ def run_mouse_macro(fullfilepath): # sets up a list of coordinates based on file
         print(mouse_coord_x_list)
         print(mouse_coord_y_list)
         # Running Macro
-        for x in range(repeat_input):
+        for repeatIndex in range(repeat_input):
             if stop_macro_running:
                 return False
             if(random.randint(1,100)<=run_chance_input):
                 for x in range(0,len(mouse_action_list),2):
                     print("NEW ACTION___________________________________________")
-                    if stop_macro_running:
-                        return False
-                    time.sleep(mouse_timer_list[x])
+                    sleep_time  = mouse_timer_list[x]-mouse_timer_list[x]%1
+                    sleep_remainder = mouse_timer_list[x]%1
+                    for sleepIndex in range(0, int(sleep_time),1):
+                        if stop_macro_running:
+                            return False
+                        time.sleep(1)
+                    time.sleep(sleep_remainder)
                     start_x_coord = mouse_coord_x_list[x]
                     start_y_coord = mouse_coord_y_list[x]
                     end_x_coord = mouse_coord_x_list[x+1]
